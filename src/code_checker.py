@@ -20,13 +20,25 @@ def load_code():
 
 # Use GPT-3 to analyze code and generate code problems
 def analyze_code_with_gpt3(code):
-    # Placeholder function to analyze code using GPT-3
-    # Replace this with your own implementation to interact with GPT-3 API
-    # and perform code analysis
-    problems = []
-    # Call GPT-3 API and process the results to generate code problems
-    # Add the generated problems to the 'problems' list
-    return problems
+    # Preface with explanation
+    prompt = "Analyze the following code changes:\n\n"
+    prompt += "```diff:\n" + code + "```\n\n"
+    prompt += "Also provide feedback on the quality, readability, and potential issues in the code."
+
+    # Generate code analysis using GPT-3
+    response = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=prompt,
+        max_tokens=1024,
+        n=1,
+        stop=None,
+        temperature=0.7
+    )
+
+    # Extract the generated analysis from the API response
+    analysis = response.choices[0].text.strip()
+
+    return analysis
 
 # Process the results and generate SARIF files
 def process_results_to_sarif(problems):
