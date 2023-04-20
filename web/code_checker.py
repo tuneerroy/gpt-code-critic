@@ -17,7 +17,7 @@ def load_code():
     return code
 
 # Use GPT-3 to analyze code and generate code problems
-def analyze_code_with_gpt3(filename, code_diff):
+def analyze_code(filename, code_diff):
     # Preface with explanation
     prompt = "Analyze the following code changes to file " + filename + ".\n"
     prompt += "You should format your response like:\n"
@@ -39,9 +39,9 @@ def analyze_code_with_gpt3(filename, code_diff):
     return result
 
 # Process results to SARIF format
-def process_results_to_sarif(filename, result):
+def get_sarif_results_for_file(filename, analysis):
     # Parse the generated analysis from GPT-3
-    results = result.split('Issue')
+    results = analysis.split('Issue')
     issues = []
     for result in results:
         issue = {}
@@ -56,7 +56,7 @@ def process_results_to_sarif(filename, result):
                 issue['location'] = location
                 issues.append(issue)
             except:
-              pass
+                pass
 
     # Create SARIF result objects
     sarif_results = []
@@ -90,6 +90,12 @@ def process_results_to_sarif(filename, result):
 
         # Add the SARIF result object to the list
         sarif_results.append(sarif_result)
+
+    return sarif_results
+
+def combine_sarif_results(results):
+
+    sarif_results = sum(results, []) # concatenate results into one list
 
     # Create SARIF report
     sarif_report = {
@@ -131,16 +137,16 @@ if __name__ == '__main__':
     code = 'def foo():\n    prnt("Hello, world!")'
 
     # Use GPT-3 to analyze code and generate code problems
-    problems = analyze_code_with_gpt3(filename, code)
+    problems = analyze_code(filename, code)
 
     print("RESPONSE:")
     print(problems)
     print("\n\n\n\n\n\n")
 
     # Process the results and generate SARIF files
-    sarif_file = process_results_to_sarif(filename, problems)
+    sarif_file = get_sarif_results_for_file(filename, problems)
 
-    print(sarif_file)
+    sairf_report = combine_sarif_results([sarif_file])
 
     # Write SARIF files to disk
     write_sarif_files([sarif_file])
