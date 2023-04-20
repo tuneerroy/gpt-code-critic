@@ -33,6 +33,9 @@ jobs:
           KUBECONFIG: ${{ secrets.KUBECONFIG }}
         run: |
           mkdir ~/.kube && echo "$KUBECONFIG" > ~/.kube/config && chmod 600 ~/.kube/config
+      - name: Update image tag
+        run: |
+          sed -i "s/IMAGE_TAG/${{ github.sha }}/g" k8s/web.yaml
       - name: Deploy to Kubernetes
         # env:
         #   IMAGE_TAG: ${{ github.sha }}
