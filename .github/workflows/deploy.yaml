@@ -40,4 +40,4 @@ jobs:
         # env:
         #   IMAGE_TAG: ${{ github.sha }}
         run: |
-          kubectl apply -f k8s/ --env IMAGE_TAG=${{ github.sha }}
+          kubectl apply -f k8s/
