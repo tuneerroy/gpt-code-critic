@@ -34,7 +34,5 @@ jobs:
         run: |
           mkdir ~/.kube && echo "$KUBECONFIG" > ~/.kube/config && chmod 600 ~/.kube/config
       - name: Deploy to Kubernetes
-        env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
         run: |
-          sed "s/{{IMAGE_VERSION}}/${{ github.sha }}/g" kubernetes/deployment.yaml | kubectl apply -f -
+          sed "s/{{IMAGE_VERSION}}/${{ github.sha }}/g" k8s/web.yaml | kubectl apply -f -
