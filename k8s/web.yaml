@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: project-web
-          image: ghcr.io/cis1880/gpt-code-critic/app:IMAGE_TAG
+          image: ghcr.io/tuneerroy/gpt-code-critic/app:IMAGE_TAG
           ports:
             - containerPort: 8000
           env:

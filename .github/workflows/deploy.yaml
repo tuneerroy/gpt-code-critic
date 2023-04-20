@@ -15,11 +15,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build images
         run: |
-          docker build -t "ghcr.io/cis1880/gpt-code-critic/app:${{ github.sha }}" web
+          docker build -t "ghcr.io/tuneerroy/gpt-code-critic/app:${{ github.sha }}" web
       - name: Push images
         if: github.ref == 'refs/heads/master'
         run: |
-          docker push "ghcr.io/cis1880/gpt-code-critic/app:${{ github.sha }}"
+          docker push "ghcr.io/tuneerroy/gpt-code-critic/app:${{ github.sha }}"
   deploy:
     name: Deploy latest version of code
     if: github.ref == 'refs/heads/main'
