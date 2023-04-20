@@ -15,7 +15,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build images
         run: |
-          docker build -t "ghcr.io/cis1880/gpt-code-critic/app:${{ github.sha }}" app
+          docker build -t "ghcr.io/cis1880/gpt-code-critic/app:${{ github.sha }}" web
       - name: Push images
         if: github.ref == 'refs/heads/master'
         run: |
