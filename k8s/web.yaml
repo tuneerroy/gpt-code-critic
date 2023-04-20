@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: project-deployment
+  name: project-web
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: project-deployment
+      app: project-web
   template:
     metadata:
       labels:
-        app: project-deployment
+        app: project-web
     spec:
       containers:
-        - name: project-container
+        - name: project-web
           image: ghcr.io/cis1880/gpt-code-critic/app:{{IMAGE_VERSION}}
           ports:
             - containerPort: 8000
