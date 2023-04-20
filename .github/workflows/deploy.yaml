@@ -1,0 +1,40 @@
+name: Deploy to "tuneer.cis188.org"
+on: push
+jobs:
+  build:
+    name: Build and publish docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build images
+        run: |
+          docker build -t "ghcr.io/cis1880/gpt-code-critic/app:${{ github.sha }}" app
+      - name: Push images
+        if: github.ref == 'refs/heads/master'
+        run: |
+          docker push "ghcr.io/cis1880/gpt-code-critic/app:${{ github.sha }}"
+  deploy:
+    name: Deploy latest version of code
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up kubeconfig
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+        run: |
+          mkdir ~/.kube && echo "$KUBECONFIG" > ~/.kube/config && chmod 600 ~/.kube/config
+      - name: Deploy to Kubernetes
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+        run: |
+          sed "s/{{IMAGE_VERSION}}/${{ github.sha }}/g" kubernetes/deployment.yaml | kubectl apply -f -

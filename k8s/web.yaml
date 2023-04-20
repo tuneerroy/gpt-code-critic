@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project-deployment
+  template:
+    metadata:
+      labels:
+        app: project-deployment
+    spec:
+      containers:
+        - name: project-container
+          image: ghcr.io/cis1880/gpt-code-critic/app:{{IMAGE_VERSION}}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: project-secret
+                  key: username
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: project-secret
+                  key: password
+      imagePullSecrets:
+        - name: docker-pull-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-web
+spec:
+  selector:
+    app: project-web
+  ports:
+    - port: 8000

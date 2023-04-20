@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: project-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: lets-encrypt-prod
+spec:
+  rules:
+    - host: "tuneer.cis188.org"
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: project-web
+                port:
+                  number: 8000
+  tls:
+    - hosts:
+        - tuneer.cis188.org
+      secretName: tuneer-cis188-org-tls
