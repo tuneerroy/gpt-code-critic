@@ -17,7 +17,7 @@ jobs:
         run: |
           docker build -t "ghcr.io/tuneerroy/gpt-code-critic/app:${{ github.sha }}" web
       - name: Push images
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         run: |
           docker push "ghcr.io/tuneerroy/gpt-code-critic/app:${{ github.sha }}"
   deploy:
