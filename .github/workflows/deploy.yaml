@@ -19,12 +19,12 @@ jobs:
 
       - name: Build images
         run: |
-          docker build -t "ghcr.io/tuneerroy/gpt-code-critic/app:${{ github.sha }}" web
+          docker build -t "ghcr.io/tuneerroy/gpt-code-critic:${{ github.sha }}" web
 
       - name: Push images
         if: github.ref == 'refs/heads/main'
         run: |
-          docker push "ghcr.io/tuneerroy/gpt-code-critic/app:${{ github.sha }}"
+          docker push "ghcr.io/tuneerroy/gpt-code-critic:${{ github.sha }}"
 
   deploy:
     name: Deploy latest version of code
