@@ -9,6 +9,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Get Git changes
         run: |
+          echo ${{ github.ref }}
           git fetch origin ${{ github.ref }}
           git diff --name-only HEAD~1 HEAD > changes.txt
       - name: Print changes
