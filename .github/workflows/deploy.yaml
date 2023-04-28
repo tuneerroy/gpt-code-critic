@@ -10,8 +10,8 @@ jobs:
       - name: Get Git changes
         run: |
           echo ${{ github.ref }} > changes.txt
-          # git fetch origin ${{ github.ref }}
-          # git diff --name-only HEAD~1 HEAD > changes.txt
+          git fetch origin ${{ github.ref }}
+          git diff --name-only HEAD~1 HEAD > changes.txt
       - name: Print changes
         run: |
           cat changes.txt
