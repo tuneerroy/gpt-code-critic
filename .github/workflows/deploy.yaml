@@ -1,6 +1,5 @@
 name: Deploy to "tuneer.cis188.org"
-on: 
-  workflow_dispatch:
+on: push
 jobs:
   test_action:
     name: Test action

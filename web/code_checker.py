@@ -1,13 +1,8 @@
-# code_checker.py
-
-# Import necessary libraries
 import openai
 import os
 import json
 
-# Load code to be checked
 def load_code():
-    # Get the path to the code file from the GitHub context
     code_file_path = os.environ.get("GITHUB_WORKSPACE") + "/path/to/code/file.py"
 
     # Read the code from the file
@@ -90,7 +85,7 @@ def get_sarif_results_for_file(filename, analysis):
 
         # Add the SARIF result object to the list
         sarif_results.append(sarif_result)
-
+    
     return sarif_results
 
 def combine_sarif_results(results):
@@ -116,20 +111,14 @@ def combine_sarif_results(results):
 
     return json.dumps(sarif_report)
 
-# Write SARIF files to disk
 def write_sarif_files(sarif_files):
-    # Placeholder function to write SARIF files to disk
-    # Replace this with your own implementation to save the SARIF files
-    # to disk, which can be used for further processing or display
+    # TODO: we don't need this, so remove this when you're done testing
     for sarif_file in sarif_files:
-        # Write the SARIF file to disk
         with open(sarif_file['filename'], 'w') as f:
             f.write(sarif_file['content'])
         print(f"Generated SARIF file: {sarif_file['filename']}")
 
-# Entry point of the script
 if __name__ == '__main__':
-    
     openai.api_key = os.environ.get("OPENAI_API_KEY")
 
     # Load code to be checked
