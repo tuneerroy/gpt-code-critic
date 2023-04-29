@@ -13,7 +13,7 @@ jobs:
       - name: Get Git changes
         run: |
           git fetch origin ${{ github.ref }}
-          git diff --name-only HEAD~1 HEAD > changes.txt
+          git diff --name-only --diff-filter=AM HEAD~1 HEAD > changes.txt
       
       - name: Print changes per file
         run: |
