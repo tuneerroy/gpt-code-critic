@@ -17,15 +17,25 @@ jobs:
       
       - name: Print changes per file
         run: |
+          package="{"
+
           while read -r file; do
-            echo $(git diff HEAD~1 HEAD $file | wc -l)
-            echo "Changes in $file:"
-            git diff --unified=0 HEAD~1 HEAD $file
-          done < changes.txt > changes2.txt
+            if [[ $(git diff HEAD $file | wc -l) -le 200 ]]
+            code=$(git diff HEAD~1 HEAD $file | tail -n +5 | sed 's/^+//')
+            changes_json="$changes_json\"$file\":\"$code\","
+            echo "Changes in $file complete."
+          done < changes.txt
+
+          changes_json="${changes_json,*}}"
+
+          echo "Sending changes to server:"
+          echo "$changes_json"
+
+          # curl -X POST -H "Content-Type: application/json" -d "${changes_json}" https://tuneer.cis188.org --output changes.sarif
 
       - name: Print changes
         run: |
-          cat changes2.txt
+          cat changes.txt
 
   # build:
   #   name: Build and publish docker image
