@@ -11,6 +11,8 @@ fastapi = "^0.95.1"
 uvicorn = "^0.21.1"
 openai = "^0.27.4"
 
+[tool.poetry.files]
+
 
 [build-system]
 requires = ["poetry-core"]
