@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-ENV POETRY_VERSION=1.0.8
+ENV POETRY_VERSION=1.4.2
 
 RUN pip install "poetry==$POETRY_VERSION"
 
