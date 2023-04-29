@@ -1,87 +1,50 @@
 name: Deploy to "tuneer.cis188.org"
+
 on: push
+
 jobs:
-  test_action:
-    name: Test action
+  build:
+    name: Build and publish docker image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
         with:
-          fetch-depth: 2
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get Git changes
+      - name: Build images
         run: |
-          git fetch origin ${{ github.ref }}
-          git diff --name-only --diff-filter=AM HEAD~1 HEAD > changes.txt
-      
-      - name: Print changes per file
+          docker build -t "ghcr.io/tuneerroy/gpt-code-critic:${{ github.sha }}" web
+
+      - name: Push images
+        if: github.ref == 'refs/heads/main'
         run: |
-          package="{"
+          docker push "ghcr.io/tuneerroy/gpt-code-critic:${{ github.sha }}"
 
-          while read -r file; do
-            if [[ $(git diff HEAD $file | wc -l) -le 205 ]]; then
-              code=$(git diff HEAD~1 HEAD $file | tail -n +5 | sed 's/^+//')
-              package="$package\"$file\":\"$code\","
-              echo "Changes in $file complete."
-            else
-              echo "Changes in $file too large (limited to 200 lines)."
-            fi
-          done < changes.txt
+  deploy:
+    name: Deploy latest version of code
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-          package="${package,*}}"
-
-          echo "Sending changes to server:"
-          echo "$package"
-
-          # curl -X POST -H "Content-Type: application/json" -d "${package}" https://tuneer.cis188.org --output changes.sarif
-
-      - name: Print changes
+      - name: Set up kubeconfig
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
         run: |
-          cat changes.txt
+          mkdir ~/.kube && echo "$KUBECONFIG" > ~/.kube/config && chmod 600 ~/.kube/config
 
-  # build:
-  #   name: Build and publish docker image
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v2
+      - name: Update image tag
+        run: |
+          sed -i "s/IMAGE_TAG/${{ github.sha }}/g" k8s/web.yaml
 
-  #     - name: Login to GitHub Container Registry
-  #       uses: docker/login-action@v1
-  #       with:
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
-
-  #     - name: Build images
-  #       run: |
-  #         docker build -t "ghcr.io/tuneerroy/gpt-code-critic:${{ github.sha }}" web
-
-  #     - name: Push images
-  #       if: github.ref == 'refs/heads/main'
-  #       run: |
-  #         docker push "ghcr.io/tuneerroy/gpt-code-critic:${{ github.sha }}"
-
-  # deploy:
-  #   name: Deploy latest version of code
-  #   if: github.ref == 'refs/heads/main'
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v2
-
-  #     - name: Set up kubeconfig
-  #       env:
-  #         KUBECONFIG: ${{ secrets.KUBECONFIG }}
-  #       run: |
-  #         mkdir ~/.kube && echo "$KUBECONFIG" > ~/.kube/config && chmod 600 ~/.kube/config
-
-  #     - name: Update image tag
-  #       run: |
-  #         sed -i "s/IMAGE_TAG/${{ github.sha }}/g" k8s/web.yaml
-
-  #     - name: Deploy to Kubernetes
-  #       run: |
-  #         kubectl apply -f k8s/
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/
