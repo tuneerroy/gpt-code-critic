@@ -1,19 +1,16 @@
-# Dockerfile for running code checker with GPT-3
+FROM python:3.8-buster
 
-# Use an official Python runtime as the base image
-FROM python:3.9-slim
+ENV POETRY_VERSION=1.0.8
 
-# Set the working directory in the container
-WORKDIR /app
+RUN pip install "poetry==$POETRY_VERSION"
 
-# Install dependencies
-RUN pip install openai
+WORKDIR /app/
 
-# Copy the code checker script into the container
-COPY code_checker.py .
+COPY pyproject.toml /app/
+COPY poetry.lock /app/
 
-# Set environment variables for GPT-3 API
-ENV OPENAI_API_KEY=<your_api_key>
+RUN poetry install --no-dev
 
-# Run the code checker script
-CMD ["python", "code_checker.py"]
+COPY . /app/
+
+CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0"]
