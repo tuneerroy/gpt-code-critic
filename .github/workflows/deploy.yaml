@@ -13,14 +13,14 @@ jobs:
       - name: Get Git changes
         run: |
           git fetch origin ${{ github.ref }}
-          git diff --name-only --diff-filter=d HEAD > changes.txt
+          git diff --name-only --diff-filter=d HEAD~1 HEAD > changes.txt
       
       - name: Print changes per file
         run: |
           while read -r file; do
-            echo $(git diff HEAD $file | wc -l)
+            echo $(git diff HEAD~1 HEAD $file | wc -l)
             echo "Changes in $file:"
-            git diff --unified=0 $file
+            git diff --unified=0 HEAD~1 HEAD $file
           done < changes.txt > changes2.txt
 
       - name: Print changes
