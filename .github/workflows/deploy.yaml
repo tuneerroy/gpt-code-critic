@@ -21,11 +21,11 @@ jobs:
             echo $(git diff HEAD $file | wc -l)
             echo "Changes in $file:"
             git diff --unified=0 $file
-          done < changes.txt > changes.txt
+          done < changes.txt > changes2.txt
 
       - name: Print changes
         run: |
-          cat changes.txt
+          cat changes2.txt
 
   # build:
   #   name: Build and publish docker image
