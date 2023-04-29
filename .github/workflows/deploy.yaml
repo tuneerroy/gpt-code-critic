@@ -20,18 +20,21 @@ jobs:
           package="{"
 
           while read -r file; do
-            if [[ $(git diff HEAD $file | wc -l) -le 200 ]]
-            code=$(git diff HEAD~1 HEAD $file | tail -n +5 | sed 's/^+//')
-            changes_json="$changes_json\"$file\":\"$code\","
-            echo "Changes in $file complete."
+            if [[ $(git diff HEAD $file | wc -l) -le 205 ]]; then
+              code=$(git diff HEAD~1 HEAD $file | tail -n +5 | sed 's/^+//')
+              package="$package\"$file\":\"$code\","
+              echo "Changes in $file complete."
+            else
+              echo "Changes in $file too large (limited to 200 lines)."
+            fi
           done < changes.txt
 
-          changes_json="${changes_json,*}}"
+          package="${package,*}}"
 
           echo "Sending changes to server:"
-          echo "$changes_json"
+          echo "$package"
 
-          # curl -X POST -H "Content-Type: application/json" -d "${changes_json}" https://tuneer.cis188.org --output changes.sarif
+          # curl -X POST -H "Content-Type: application/json" -d "${package}" https://tuneer.cis188.org --output changes.sarif
 
       - name: Print changes
         run: |
