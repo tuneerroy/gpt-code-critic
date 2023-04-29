@@ -7,17 +7,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
+        # with:
+        #   fetch-depth: 2
 
       - name: Get Git changes
         run: |
           git fetch origin ${{ github.ref }}
-          git diff --name-only HEAD~1 HEAD > changes.txt
-          while read -r file: do
-            echo "Git diff for $file:"
-            git diff HEAD~1 HEAD -- "$file"
-          done < changes.txt
+          git diff --name-only --diff-filter=d HEAD > changes.txt
+      
+      - name: Print changes per file
+        run: |
+          while read -r file; do
+            echo $(git diff HEAD $file | wc -l)
+            echo "Changes in $file:"
+            git diff --unified=0 $file
+          done < changes.txt > changes.txt
 
       - name: Print changes
         run: |
