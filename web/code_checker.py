@@ -172,10 +172,12 @@ def check_api_key(api_key):
         response = openai.Completion.create(
             engine="text-ada-001", prompt="Hello, world!", max_tokens=1
         )
+        openai.api_key = None
         if response.choices[0].text:
             return True
     except Exception as e:
         print(e)
+    openai.api_key = None
     return False
 
 
