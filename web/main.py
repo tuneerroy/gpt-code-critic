@@ -1,9 +1,8 @@
 import os
-import secrets
 from code_checker import get_sarif_report, is_valid_key
 
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi import FastAPI, HTTPException, status
+from fastapi.security import HTTPBasic
 from typing import List
 from pydantic import BaseModel
 
@@ -21,24 +20,26 @@ class CodeChanges(BaseModel):
     key: str
     files: List[File]
 
+"""
+Test endpoint to check if the server is running
 
-# def get_admin_username(credentials: HTTPBasicCredentials = Depends(security)) -> str:
-#     if not auth_required:
-#         return "guestuser"
-#     correct_username = secrets.compare_digest(credentials.username, auth_user)
-#     correct_password = secrets.compare_digest(credentials.password, auth_password)
-#     if auth_required and not (correct_username and correct_password):
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Incorrect email or password",
-#             headers={"WWW-Authenticate": "Basic"},
-#         )
-#     return credentials.username
-
+Returns:
+    status of the server
+"""
 @app.get("/")
 def test():
     return {"status": "ok"}
 
+
+"""
+Analysis endpoint for code changes
+
+Args:
+    code_changes: the code changes to analyze 
+
+Returns:
+    analysis: the analysis of the code changes
+"""
 @app.post("/analyze")
 def analyze_code(code_changes: CodeChanges): # , username: str = Depends(get_admin_username)):
     # check if key and files are present
@@ -76,9 +77,13 @@ def analyze_code(code_changes: CodeChanges): # , username: str = Depends(get_adm
 
     # TODO: remove this after testing
     print(analysis)
-    
+
     return {"analysis": analysis}
 
+
+"""
+Starts the server
+"""
 if __name__ == "__main__":
     import uvicorn
 
