@@ -2,9 +2,18 @@ import openai
 import os
 import json
 
-# Use GPT-3 to analyze code and generate code problems
+"""
+Analyze a file using GPT-3
+
+Args:
+    filename: the name of the file to analyze
+    code_diff: the diff of the file to analyze
+
+Returns:
+    result: the analysis of the file
+"""
 def analyze_file(filename, code_diff):
-    # Preface with explanation
+    # preface with explanation
     prompt = "Analyze the following code changes to file " + filename + ".\n"
     prompt += "You should format your response like:\n"
     prompt += "Issue X (Line Y, Column Z)::: Comment about problem, quality, readability, or issue\n"
@@ -12,6 +21,7 @@ def analyze_file(filename, code_diff):
     prompt += "...\n\n\n"
     prompt += "diff:\n" + code_diff + "\n"
 
+    # send prompt to GPT-3
     completion = openai.ChatCompletion.create(
       model="gpt-3.5-turbo",
       messages=[
@@ -19,13 +29,23 @@ def analyze_file(filename, code_diff):
       ]
     )
 
-    # Extract the generated analysis from the API response
+    # extract the generated analysis from the API response
     result = completion.choices[0].message.content
 
     return result
 
-# Process results to SARIF format
-def get_sarif_results_for_file(filename, analysis):
+
+"""
+Get the SARIF results for a file
+
+Args:
+    filename: the name of the file to analyze
+    analysis: the analysis of the file to analyze
+
+Returns:  
+    sarif_results: the SARIF results for the file
+"""
+def get_sarif_results_for_file(filename: str, analysis) -> List[Dict]:
     # Parse the generated analysis from GPT-3
     results = analysis.split('Issue')
     issues = []
@@ -79,6 +99,15 @@ def get_sarif_results_for_file(filename, analysis):
     
     return sarif_results
 
+"""
+Combine SARIF results into one report
+
+Args:
+    results: the SARIF results to combine
+
+Returns:
+    sarif_report: the combined SARIF report
+"""
 def combine_sarif_results(results):
 
     sarif_results = sum(results, []) # concatenate results into one list
@@ -102,21 +131,40 @@ def combine_sarif_results(results):
 
     return json.dumps(sarif_report)
 
-def get_sarif_report(key, files):
+"""
+Get the SARIF report for a list of files
+
+Args:
+    files: the files to analyze
+    key: the API key to use (optional); defaults to OPENAI_API_KEY env variable
+
+Returns:
+    sarif_report: the SARIF report for the files
+"""
+def get_sarif_report(files, key=os.environ.get("OPENAI_API_KEY")):
+    # set API key
     openai.api_key = key
+
+    # get SARIF results for each file
     sarif_files = []
     for name, code in files.items():
         problems = analyze_file(name, code)
         sarif_file = get_sarif_results_for_file(name, problems)
         sarif_files.append(sarif_file)
+
+    # combine SARIF results into one report
     sarif_report = combine_sarif_results(sarif_files)
+    
     return sarif_report
 
-def get_sarif_report(files):
-    return get_sarif_report(os.environ.get("OPENAI_API_KEY"), files)
-
+"""
+Main function for testing
+"""
 if __name__ == '__main__':
     filename = 'main.py'
     code = 'def foo():\n    prnt("Hello, world!")'
 
-    print(get_sarif_report({filename: code}))
+    if (os.environ.get("OPENAI_API_KEY") == None):
+        print("Please set OPENAI_API_KEY environment variable.")
+    else:
+        print(get_sarif_report({filename: code}))
