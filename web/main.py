@@ -3,7 +3,7 @@ from typing import List
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 
-from code_checker import get_sarif_report, is_valid_key
+from code_checker import get_sarif_report, check_api_key
 
 app = FastAPI()
 
@@ -67,7 +67,7 @@ def analyze_code(code_changes: CodeChanges):
             )
 
     # check that key is valid
-    if not is_valid_key(code_changes.key):
+    if not check_api_key(code_changes.key):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid key",
