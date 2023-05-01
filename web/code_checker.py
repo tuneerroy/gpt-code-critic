@@ -154,6 +154,9 @@ def get_sarif_report(files, key=os.environ.get("OPENAI_API_KEY")):
 
     # combine SARIF results into one report
     sarif_report = combine_sarif_results(sarif_files)
+
+    # reset API key so it doesn't get saved
+    openai.api_key = None
     
     return sarif_report
 
