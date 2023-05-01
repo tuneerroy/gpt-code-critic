@@ -3,19 +3,18 @@ import os
 
 import openai
 
-"""
-Analyze a file using GPT-3
-
-Args:
-    filename: the name of the file to analyze
-    code_diff: the diff of the file to analyze
-
-Returns:
-    result: the analysis of the file
-"""
-
 
 def analyze_file(filename, code_diff):
+    """
+    Analyze a file using GPT-3
+
+    Args:
+        filename: the name of the file to analyze
+        code_diff: the diff of the file to analyze
+
+    Returns:
+        result: the analysis of the file
+    """
     # preface with explanation
     prompt = "Analyze the following code changes to file " + filename + ".\n"
     prompt += "You should format your response like:\n"
@@ -35,19 +34,17 @@ def analyze_file(filename, code_diff):
     return result
 
 
-"""
-Get the SARIF results for a file
-
-Args:
-    filename: the name of the file to analyze
-    analysis: the analysis of the file to analyze
-
-Returns:  
-    sarif_results: the SARIF results for the file
-"""
-
-
 def get_sarif_results_for_file(filename, analysis):
+    """
+    Get the SARIF results for a file
+
+    Args:
+        filename: the name of the file to analyze
+        analysis: the analysis of the file to analyze
+
+    Returns:
+        sarif_results: the SARIF results for the file
+    """
     # Parse the generated analysis from GPT-3
     results = analysis.split("Issue")
     issues = []
@@ -98,19 +95,16 @@ def get_sarif_results_for_file(filename, analysis):
     return sarif_results
 
 
-"""
-Combine SARIF results into one report
-
-Args:
-    results: the SARIF results to combine
-
-Returns:
-    sarif_report: the combined SARIF report
-"""
-
-
 def combine_sarif_results(results):
+    """
+    Combine SARIF results into one report
 
+    Args:
+        results: the SARIF results to combine
+
+    Returns:
+        sarif_report: the combined SARIF report
+    """
     sarif_results = sum(results, [])  # concatenate results into one list
 
     # Create SARIF report
@@ -133,19 +127,17 @@ def combine_sarif_results(results):
     return json.dumps(sarif_report)
 
 
-"""
-Get the SARIF report for a list of files
-
-Args:
-    files: the files to analyze
-    key: the API key to use (optional); defaults to OPENAI_API_KEY env variable
-
-Returns:
-    sarif_report: the SARIF report for the files
-"""
-
-
 def get_sarif_report(files, key=os.environ.get("OPENAI_API_KEY")):
+    """
+    Get the SARIF report for a list of files
+
+    Args:
+        files: the files to analyze
+        key: the API key to use (optional); defaults to OPENAI_API_KEY env variable
+
+    Returns:
+        sarif_report: the SARIF report for the files
+    """
     # set API key
     openai.api_key = key
 
@@ -165,18 +157,16 @@ def get_sarif_report(files, key=os.environ.get("OPENAI_API_KEY")):
     return sarif_report
 
 
-"""
-Check if an API key is valid
-
-Args:
-    api_key: the API key to check
-
-Returns:
-    True if the API key is valid, False otherwise
-"""
-
-
 def check_api_key(api_key):
+    """
+    Check if an API key is valid
+
+    Args:
+        api_key: the API key to check
+
+    Returns:
+        True if the API key is valid, False otherwise
+    """
     openai.api_key = api_key
     try:
         response = openai.Completion.create(

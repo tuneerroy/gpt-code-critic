@@ -3,7 +3,7 @@ from typing import List
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 
-from code_checker import get_sarif_report, check_api_key
+from code_checker import check_api_key, get_sarif_report
 
 app = FastAPI()
 
@@ -18,32 +18,28 @@ class CodeChanges(BaseModel):
     files: List[File]
 
 
-"""
-Test endpoint to check if the server is running
-
-Returns:
-    status of the server
-"""
-
-
 @app.get("/")
 def test():
+    """
+    Test endpoint to check if the server is running
+
+    Returns:
+        status of the server
+    """
     return {"status": "ok"}
-
-
-"""
-Analysis endpoint for code changes
-
-Args:
-    code_changes: the code changes to analyze 
-
-Returns:
-    analysis: the analysis of the code changes
-"""
 
 
 @app.post("/analyze")
 def analyze_code(code_changes: CodeChanges):
+    """
+    Analysis endpoint for code changes
+
+    Args:
+        code_changes: the code changes to analyze
+
+    Returns:
+        analysis: the analysis of the code changes
+    """
     # check if key and files are present
     if not (code_changes.key and code_changes.files):
         raise HTTPException(
@@ -83,10 +79,10 @@ def analyze_code(code_changes: CodeChanges):
     return {"analysis": analysis}
 
 
-"""
-Starts the server
-"""
 if __name__ == "__main__":
+    """
+    Starts the server
+    """
     import uvicorn
 
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
