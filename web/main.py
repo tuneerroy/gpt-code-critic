@@ -40,7 +40,7 @@ def test():
     return {"status": "ok"}
 
 @app.post("/analyze")
-def analyze_code(code_changes: CodeChanges, username: str = Depends(get_admin_username)):
+def analyze_code(code_changes: CodeChanges): # , username: str = Depends(get_admin_username)):
     code_strings = {file.name: file.code for file in code_changes.files}
     analysis = get_sarif_report(code_changes.key, code_strings)
     print(analysis)
