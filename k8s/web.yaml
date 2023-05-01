@@ -40,3 +40,12 @@ spec:
     app: project-web
   ports:
     - port: 8000
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: project-secret
+type: kubernetes.io/basic-auth
+stringData:
+  username: username
+  password: password
