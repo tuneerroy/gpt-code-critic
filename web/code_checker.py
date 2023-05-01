@@ -143,9 +143,9 @@ def get_sarif_report(files, key=os.environ.get("OPENAI_API_KEY")):
 
     # get SARIF results for each file
     sarif_files = []
-    for name, code in files.items():
-        problems = analyze_file(name, code)
-        sarif_file = get_sarif_results_for_file(name, problems)
+    for file in files:
+        problems = analyze_file(file.name, file.code)
+        sarif_file = get_sarif_results_for_file(file.name, problems)
         sarif_files.append(sarif_file)
 
     # combine SARIF results into one report
