@@ -65,10 +65,7 @@ def analyze_code(code_changes: CodeChanges):
     # get SARIF report
     code_strings = {file.name: file.code for file in code_changes.files}
     analysis = get_sarif_report(code_strings, code_changes.key)
-
-    # TODO: remove this after testing
-    print(analysis)
-
+    
     return {"analysis": analysis}
 
 
