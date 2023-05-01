@@ -1,15 +1,25 @@
 import os
 import secrets
-from code_checker import analyze_code_with_gpt3
+from code_checker import get_sarif_report
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from typing import List
+from pydantic import BaseModel
 
 app = FastAPI()
 security = HTTPBasic()
 auth_user = os.getenv("ADMIN_USERNAME", None)
 auth_password = os.getenv("ADMIN_PASSWORD", None)
 auth_required = os.getenv("AUTH_REQUIRED", "false").lower() in ["true", "t"]
+
+class File(BaseModel):
+    name: str
+    code: str
+
+class CodeChanges(BaseModel):
+    key: str
+    files: List[File]
 
 
 # def get_admin_username(credentials: HTTPBasicCredentials = Depends(security)) -> str:
@@ -29,10 +39,12 @@ auth_required = os.getenv("AUTH_REQUIRED", "false").lower() in ["true", "t"]
 def test():
     return {"status": "ok"}
 
-@app.post("/analysis")
-def analyze_code(code: str): # , username: str = Depends(get_admin_username)):
-    print(analyze_code_with_gpt3(code))
-    return {"analysis": "chill"}
+@app.post("/analyze")
+def analyze_code(code_changes: CodeChanges, username: str = Depends(get_admin_username)):
+    code_strings = {file.name: file.code for file in code_changes.files}
+    analysis = get_sarif_report(code_changes.key, code_strings)
+    print(analysis)
+    return {"analysis": analysis}
 
 if __name__ == "__main__":
     import uvicorn

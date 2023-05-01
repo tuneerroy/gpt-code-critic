@@ -2,17 +2,8 @@ import openai
 import os
 import json
 
-def load_code():
-    code_file_path = os.environ.get("GITHUB_WORKSPACE") + "/path/to/code/file.py"
-
-    # Read the code from the file
-    with open(code_file_path, 'r') as f:
-        code = f.read()
-
-    return code
-
 # Use GPT-3 to analyze code and generate code problems
-def analyze_code(filename, code_diff):
+def analyze_file(filename, code_diff):
     # Preface with explanation
     prompt = "Analyze the following code changes to file " + filename + ".\n"
     prompt += "You should format your response like:\n"
@@ -99,8 +90,8 @@ def combine_sarif_results(results):
             {
                 "tool": {
                     "driver": {
-                        "name": "GPT-3 Code Analysis",
-                        "informationUri": "https://openai.com/gpt-3/",
+                        "name": "GPT-3.5 Code Analysis",
+                        "informationUri": "https://platform.openai.com/docs/models/overview",
                         "version": "1.0"
                     }
                 },
@@ -111,32 +102,21 @@ def combine_sarif_results(results):
 
     return json.dumps(sarif_report)
 
-def write_sarif_files(sarif_files):
-    # TODO: we don't need this, so remove this when you're done testing
-    for sarif_file in sarif_files:
-        with open(sarif_file['filename'], 'w') as f:
-            f.write(sarif_file['content'])
-        print(f"Generated SARIF file: {sarif_file['filename']}")
+def get_sarif_report(key, files):
+    openai.api_key = key
+    sarif_files = []
+    for name, code in files.items():
+        problems = analyze_file(name, code)
+        sarif_file = get_sarif_results_for_file(name, problems)
+        sarif_files.append(sarif_file)
+    sarif_report = combine_sarif_results(sarif_files)
+    return sarif_report
+
+def get_sarif_report(files):
+    return get_sarif_report(os.environ.get("OPENAI_API_KEY"), files)
 
 if __name__ == '__main__':
-    openai.api_key = os.environ.get("OPENAI_API_KEY")
-
-    # Load code to be checked
     filename = 'main.py'
     code = 'def foo():\n    prnt("Hello, world!")'
 
-    # Use GPT-3 to analyze code and generate code problems
-    problems = analyze_code(filename, code)
-
-    print("RESPONSE:")
-    print(problems)
-    print("\n\n\n\n\n\n")
-
-    # Process the results and generate SARIF files
-    sarif_file = get_sarif_results_for_file(filename, problems)
-
-    sairf_report = combine_sarif_results([sarif_file])
-
-    # Write SARIF files to disk
-    write_sarif_files([sarif_file])
-
+    print(get_sarif_report({filename: code}))
