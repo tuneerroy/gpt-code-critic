@@ -25,9 +25,9 @@ def get_admin_username(credentials: HTTPBasicCredentials = Depends(security)) ->
         )
     return credentials.username
 
-@app.get("/test")
+@app.get("/")
 def test():
-    return {"status": "success"}
+    return {"status": "ok"}
 
 @app.post("/analysis")
 def analyze_code(code: str, username: str = Depends(get_admin_username)):
