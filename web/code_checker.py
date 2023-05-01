@@ -168,7 +168,6 @@ def check_api_key(api_key):
         True if the API key is valid, False otherwise
     """
     openai.api_key = api_key
-    print(openai.api_key)
     try:
         response = openai.Completion.create(
             engine="text-ada-001", prompt="Hello, world!", max_tokens=1
