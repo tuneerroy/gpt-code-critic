@@ -40,6 +40,13 @@ def analyze_code(code_changes: CodeChanges):
     Returns:
         analysis: the analysis of the code changes
     """
+    # check if any files were submitted
+    if not code_changes.files:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No files were submitted",
+        )
+
     # check if file limit is not exceeded
     if len(code_changes.files) > 10:
         raise HTTPException(
