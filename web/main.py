@@ -41,7 +41,7 @@ Returns:
     analysis: the analysis of the code changes
 """
 @app.post("/analyze")
-def analyze_code(code_changes: CodeChanges): # , username: str = Depends(get_admin_username)):
+def analyze_code(code_changes: CodeChanges):
     # check if key and files are present
     if not (code_changes.key and code_changes.files):
         raise HTTPException(

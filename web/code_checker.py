@@ -45,7 +45,7 @@ Args:
 Returns:  
     sarif_results: the SARIF results for the file
 """
-def get_sarif_results_for_file(filename: str, analysis) -> List[Dict]:
+def get_sarif_results_for_file(filename, analysis):
     # Parse the generated analysis from GPT-3
     results = analysis.split('Issue')
     issues = []
@@ -190,7 +190,7 @@ if __name__ == '__main__':
     filename = 'main.py'
     code = 'def foo():\n    prnt("Hello, world!")'
 
-    if (os.environ.get("OPENAI_API_KEY") == None):
+    if (os.environ.get("OPENAI_API_KEY") is None):
         print("Please set OPENAI_API_KEY environment variable.")
     else:
         print(get_sarif_report({filename: code}))
