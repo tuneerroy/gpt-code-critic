@@ -130,3 +130,6 @@ dmypy.json
 
 # Secret k8s file
 k8s/additional.yaml
+
+# VSCode
+.vscode/
