@@ -45,7 +45,7 @@ def get_sarif_results_for_file(filename, analysis):
     Returns:
         sarif_results: the SARIF results for the file
     """
-    # Parse the generated analysis from GPT-3
+    # parse the generated analysis from GPT-3
     results = analysis.split("Issue")
     issues = []
     for result in results:
@@ -63,17 +63,17 @@ def get_sarif_results_for_file(filename, analysis):
             except:
                 pass
 
-    # Create SARIF result objects
+    # create SARIF result objects
     sarif_results = []
     for issue in issues:
-        # Extract issue details from the analysis
+        # extract issue details from the analysis
         message = issue.get("message", "")
         location = issue.get("location", {})
         file_path = location.get("file", "")
         line_number = location.get("line", 0)
         column_number = location.get("column", 0)
 
-        # Create SARIF result object
+        # create SARIF result object
         sarif_result = {
             "message": {"text": message},
             "locations": [
@@ -89,7 +89,7 @@ def get_sarif_results_for_file(filename, analysis):
             ],
         }
 
-        # Add the SARIF result object to the list
+        # add the SARIF result object to the list
         sarif_results.append(sarif_result)
 
     return sarif_results
@@ -107,7 +107,7 @@ def combine_sarif_results(results):
     """
     sarif_results = sum(results, [])  # concatenate results into one list
 
-    # Create SARIF report
+    # create SARIF report
     sarif_report = {
         "version": "2.1.0",
         "runs": [
