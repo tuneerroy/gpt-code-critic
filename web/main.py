@@ -54,14 +54,6 @@ def analyze_code(code_changes: CodeChanges):
             detail="Maximum 10 files are allowed",
         )
 
-    # check that each file is valid
-    for file in code_changes.files:
-        if not (file.name and file.code):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Name and code are required for each file",
-            )
-
     # check that key is valid
     if not check_api_key(code_changes.key):
         raise HTTPException(
