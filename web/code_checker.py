@@ -124,7 +124,7 @@ def combine_sarif_results(results):
         ],
     }
 
-    return json.dumps(sarif_report)
+    return sarif_report
 
 
 def get_sarif_report(files, key=os.environ.get("OPENAI_API_KEY")):
@@ -143,9 +143,9 @@ def get_sarif_report(files, key=os.environ.get("OPENAI_API_KEY")):
 
     # get SARIF results for each file
     sarif_files = []
-    for file in files:
-        problems = analyze_file(file.name, file.code)
-        sarif_file = get_sarif_results_for_file(file.name, problems)
+    for name, code in files.items():
+        problems = analyze_file(name, code)
+        sarif_file = get_sarif_results_for_file(name, problems)
         sarif_files.append(sarif_file)
 
     # combine SARIF results into one report
@@ -189,4 +189,4 @@ if __name__ == "__main__":
     if os.environ.get("OPENAI_API_KEY") is None:
         print("Please set OPENAI_API_KEY environment variable.")
     else:
-        print(get_sarif_report({filename: code}))
+        print(json.dumps(get_sarif_report({filename: code}), indent=2))
