@@ -161,6 +161,29 @@ def get_sarif_report(files, key=os.environ.get("OPENAI_API_KEY")):
     return sarif_report
 
 """
+Check if an API key is valid
+
+Args:
+    api_key: the API key to check
+
+Returns:
+    True if the API key is valid, False otherwise
+"""
+def check_api_key(api_key):
+    openai.api_key = api_key
+    try:
+        response = openai.Completion.create(
+            engine="text-ada-001",
+            prompt="Hello, world!",
+            max_tokens=1
+        )
+        if response.choices[0].text:
+            return True
+    except Exception as e:
+        print(e)
+    return False
+
+"""
 Main function for testing
 """
 if __name__ == '__main__':
