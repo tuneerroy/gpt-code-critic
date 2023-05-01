@@ -5,6 +5,7 @@ from code_checker import get_sarif_report
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import List
+from pydantic import BaseModel
 
 app = FastAPI()
 security = HTTPBasic()
