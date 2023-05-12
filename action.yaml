@@ -1,0 +1,50 @@
+name: GPT Code Critic
+description: "Run GPT Code Critic to analyze code changes!"
+branding:
+  icon: 'aperture'
+  color: 'gray-dark'
+inputs:
+  openai_api_key:
+    description: "API key for OpenAI GPT"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        pip install -r ${{ github.action_path }}/requirements.txt
+
+    - name: Get code differences
+      shell: bash
+      run: |
+        report=$(python ${{ github.action_path }}/main.py)
+        echo $report > results.sarif
+      env:
+        OPENAI_API_KEY: ${{ inputs.openai_api_key }}
+    
+    - name: Print results
+      shell: bash
+      run: |
+        if [ ! -f results.sarif ]; then
+          echo "::error::results.sarif not found"
+          exit 1
+        fi
+        cat results.sarif
+
+    - name: Upload results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: results.sarif
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
