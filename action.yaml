@@ -1,4 +1,4 @@
-name: GPT-Code-Critic
+name: GPTCodeCritic
 description: "Run GPT Code Critic to analyze code changes!"
 branding:
   icon: 'aperture'
